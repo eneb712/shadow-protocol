@@ -118,54 +118,135 @@
             body {
                 padding: 0;
                 display: block;
+                background: #000;
             }
             
             #gameContainer {
-                border: none;
-                box-shadow: none;
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
+                border: 2px solid #00ff88;
+                box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw !important;
+                height: 100vh !important;
+                margin: 0 !important;
+                transform: none !important;
+            }
+            
+            canvas {
+                width: 100% !important;
+                height: 100% !important;
             }
             
             .screen-title {
-                font-size: 32px !important;
+                font-size: 28px !important;
+                margin-bottom: 15px !important;
             }
             
             .screen-subtitle {
-                font-size: 18px !important;
+                font-size: 16px !important;
+                margin-bottom: 15px !important;
             }
             
             .btn {
-                padding: 12px 30px !important;
-                font-size: 16px !important;
+                padding: 10px 25px !important;
+                font-size: 14px !important;
+                margin: 8px !important;
             }
             
             .instructions {
-                font-size: 12px;
-                max-width: 90%;
-                max-height: 60vh;
+                font-size: 11px;
+                max-width: 85%;
+                max-height: 55vh;
                 overflow-y: auto;
+                padding: 15px;
+            }
+            
+            .instructions h3 {
+                font-size: 16px;
+            }
+            
+            #mobileControls {
+                display: block !important;
             }
         }
         
         /* Landscape mobile optimization */
         @media (max-width: 767px) and (orientation: landscape) {
             .screen-title {
-                font-size: 24px !important;
-                margin-bottom: 10px !important;
+                font-size: 22px !important;
+                margin-bottom: 8px !important;
             }
             
             .screen-subtitle {
                 font-size: 14px !important;
-                margin-bottom: 10px !important;
+                margin-bottom: 8px !important;
             }
             
             .btn {
                 padding: 8px 20px !important;
-                font-size: 14px !important;
+                font-size: 13px !important;
                 margin: 5px !important;
+            }
+            
+            .instructions {
+                max-height: 50vh;
+                font-size: 10px;
+            }
+            
+            .instructions h3 {
+                font-size: 14px;
+            }
+            
+            #mobileControls {
+                height: 180px;
+            }
+            
+            #joystick {
+                width: 100px;
+                height: 100px;
+                bottom: 15px;
+                left: 15px;
+            }
+            
+            #joystickKnob {
+                width: 40px;
+                height: 40px;
+            }
+            
+            #cloakButton {
+                width: 70px;
+                height: 70px;
+                bottom: 25px;
+                right: 25px;
+                font-size: 14px;
+            }
+        }
+        
+        /* Portrait mobile optimization */
+        @media (max-width: 767px) and (orientation: portrait) {
+            #mobileControls {
+                height: 220px;
+            }
+            
+            #joystick {
+                width: 110px;
+                height: 110px;
+                bottom: 20px;
+                left: 20px;
+            }
+            
+            #joystickKnob {
+                width: 45px;
+                height: 45px;
+            }
+            
+            #cloakButton {
+                width: 75px;
+                height: 75px;
+                bottom: 35px;
+                right: 25px;
+                font-size: 13px;
             }
         }
         
@@ -1282,39 +1363,17 @@
                 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
                 
                 if (isMobile) {
-                    // Calculate dimensions maintaining aspect ratio
-                    const windowWidth = window.innerWidth;
-                    const windowHeight = window.innerHeight;
-                    const gameAspectRatio = 800 / 600; // 4:3 ratio
-                    const windowAspectRatio = windowWidth / windowHeight;
-                    
-                    let width, height;
-                    
-                    if (windowAspectRatio > gameAspectRatio) {
-                        // Window is wider - fit to height
-                        height = windowHeight;
-                        width = height * gameAspectRatio;
-                    } else {
-                        // Window is taller - fit to width
-                        width = windowWidth;
-                        height = width / gameAspectRatio;
-                    }
+                    // Full screen on mobile - no aspect ratio constraints
+                    const width = window.innerWidth;
+                    const height = window.innerHeight;
                     
                     container.style.width = width + 'px';
                     container.style.height = height + 'px';
-                    
-                    // Center the container if it doesn't fill the screen
-                    if (width < windowWidth) {
-                        container.style.marginLeft = ((windowWidth - width) / 2) + 'px';
-                    } else {
-                        container.style.marginLeft = '0px';
-                    }
-                    
-                    if (height < windowHeight) {
-                        container.style.marginTop = ((windowHeight - height) / 2) + 'px';
-                    } else {
-                        container.style.marginTop = '0px';
-                    }
+                    container.style.position = 'fixed';
+                    container.style.top = '0';
+                    container.style.left = '0';
+                    container.style.margin = '0';
+                    container.style.transform = 'none';
                     
                     // Show mobile controls
                     if (this.mobileControls) {
@@ -1336,8 +1395,11 @@
                     
                     container.style.width = width + 'px';
                     container.style.height = height + 'px';
-                    container.style.marginLeft = 'auto';
-                    container.style.marginTop = 'auto';
+                    container.style.position = 'relative';
+                    container.style.margin = 'auto';
+                    container.style.top = 'auto';
+                    container.style.left = 'auto';
+                    container.style.transform = 'none';
                     
                     // Hide mobile controls
                     if (this.mobileControls) {
@@ -1690,67 +1752,71 @@
 
             drawHUD() {
                 const ctx = this.ctx;
-                const padding = 15;
-                const barWidth = 200;
-                const barHeight = 20;
+                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                const padding = isMobile ? 10 : 15;
+                const barWidth = isMobile ? 150 : 200;
+                const barHeight = isMobile ? 15 : 20;
+                const fontSize = isMobile ? 16 : 24;
+                const smallFont = isMobile ? 10 : 14;
+                const levelFont = isMobile ? 12 : 18;
 
                 // Score and Level
                 ctx.fillStyle = '#00ff88';
-                ctx.font = 'bold 24px Courier New';
+                ctx.font = `bold ${fontSize}px Courier New`;
                 ctx.textAlign = 'left';
-                ctx.fillText(`SCORE: ${Math.floor(this.score)}`, padding, 30);
+                ctx.fillText(`SCORE: ${Math.floor(this.score)}`, padding, 25);
                 
                 ctx.fillStyle = '#ffaa00';
-                ctx.font = 'bold 18px Courier New';
-                ctx.fillText(`LEVEL: ${this.currentLevel}/${this.totalLevels}`, padding, 55);
+                ctx.font = `bold ${levelFont}px Courier New`;
+                ctx.fillText(`LEVEL: ${this.currentLevel}/${this.totalLevels}`, padding, 45);
 
                 // Health bar
                 ctx.fillStyle = '#ffffff';
-                ctx.font = '14px Courier New';
-                ctx.fillText('HEALTH', padding, 80);
+                ctx.font = `${smallFont}px Courier New`;
+                ctx.fillText('HEALTH', padding, isMobile ? 65 : 80);
                 
                 ctx.fillStyle = '#333333';
-                ctx.fillRect(padding, 85, barWidth, barHeight);
+                ctx.fillRect(padding, isMobile ? 70 : 85, barWidth, barHeight);
                 
                 const healthPercent = this.player.health / this.player.maxHealth;
                 ctx.fillStyle = healthPercent > 0.5 ? '#00ff88' : healthPercent > 0.25 ? '#ffaa00' : '#ff3333';
-                ctx.fillRect(padding, 85, barWidth * healthPercent, barHeight);
+                ctx.fillRect(padding, isMobile ? 70 : 85, barWidth * healthPercent, barHeight);
                 
                 ctx.strokeStyle = '#ffffff';
                 ctx.lineWidth = 2;
-                ctx.strokeRect(padding, 85, barWidth, barHeight);
+                ctx.strokeRect(padding, isMobile ? 70 : 85, barWidth, barHeight);
 
                 // Energy bar
                 ctx.fillStyle = '#ffffff';
-                ctx.fillText('ENERGY', padding, 125);
+                ctx.fillText('ENERGY', padding, isMobile ? 100 : 125);
                 
                 ctx.fillStyle = '#333333';
-                ctx.fillRect(padding, 130, barWidth, barHeight);
+                ctx.fillRect(padding, isMobile ? 105 : 130, barWidth, barHeight);
                 
                 const energyPercent = this.player.energy / this.player.maxEnergy;
                 ctx.fillStyle = '#00aaff';
-                ctx.fillRect(padding, 130, barWidth * energyPercent, barHeight);
+                ctx.fillRect(padding, isMobile ? 105 : 130, barWidth * energyPercent, barHeight);
                 
                 ctx.strokeStyle = '#ffffff';
                 ctx.lineWidth = 2;
-                ctx.strokeRect(padding, 130, barWidth, barHeight);
+                ctx.strokeRect(padding, isMobile ? 105 : 130, barWidth, barHeight);
 
                 // Cloak indicator
                 if (this.player.isCloaked) {
                     ctx.fillStyle = '#00aaff';
-                    ctx.font = 'bold 16px Courier New';
+                    ctx.font = `bold ${smallFont + 2}px Courier New`;
                     ctx.textAlign = 'center';
-                    ctx.fillText('[ CLOAKED ]', CONFIG.canvas.width / 2, 30);
+                    ctx.fillText('[ CLOAKED ]', CONFIG.canvas.width / 2, 25);
                 }
 
                 // Objective status
                 ctx.fillStyle = '#ffaa00';
-                ctx.font = '14px Courier New';
+                ctx.font = `${isMobile ? 10 : 14}px Courier New`;
                 ctx.textAlign = 'right';
                 if (!this.player.hasDataCore) {
-                    ctx.fillText('OBJECTIVE: Retrieve Data Core', CONFIG.canvas.width - padding, 30);
+                    ctx.fillText(isMobile ? 'GET DATA CORE' : 'OBJECTIVE: Retrieve Data Core', CONFIG.canvas.width - padding, 25);
                 } else {
-                    ctx.fillText('OBJECTIVE: Reach Extraction Point', CONFIG.canvas.width - padding, 30);
+                    ctx.fillText(isMobile ? 'REACH EXTRACTION' : 'OBJECTIVE: Reach Extraction Point', CONFIG.canvas.width - padding, 25);
                 }
             }
 

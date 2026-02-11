@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <title>Shadow Protocol - Stealth Action Game</title>
     <style>
         * {
@@ -19,6 +21,10 @@
             align-items: center;
             min-height: 100vh;
             color: #00ff88;
+            overflow: hidden;
+            touch-action: none;
+            -webkit-user-select: none;
+            user-select: none;
         }
         
         #gameContainer {
@@ -26,12 +32,139 @@
             background: #000;
             border: 3px solid #00ff88;
             box-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
+            max-width: 100vw;
+            max-height: 100vh;
         }
         
         canvas {
             display: block;
             image-rendering: crisp-edges;
             image-rendering: pixelated;
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* Mobile Controls */
+        #mobileControls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 250px;
+            pointer-events: none;
+            z-index: 5;
+        }
+        
+        .control-button {
+            position: absolute;
+            background: rgba(0, 255, 136, 0.3);
+            border: 2px solid rgba(0, 255, 136, 0.6);
+            border-radius: 50%;
+            pointer-events: auto;
+            touch-action: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #00ff88;
+            font-weight: bold;
+            font-size: 18px;
+            user-select: none;
+        }
+        
+        .control-button:active {
+            background: rgba(0, 255, 136, 0.5);
+            border-color: #00ff88;
+        }
+        
+        #joystick {
+            width: 120px;
+            height: 120px;
+            bottom: 20px;
+            left: 20px;
+        }
+        
+        #joystickKnob {
+            width: 50px;
+            height: 50px;
+            background: rgba(0, 255, 136, 0.7);
+            border: 2px solid #00ff88;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+        
+        #cloakButton {
+            width: 80px;
+            height: 80px;
+            bottom: 40px;
+            right: 30px;
+        }
+        
+        /* Desktop - hide mobile controls */
+        @media (min-width: 768px) {
+            #mobileControls {
+                display: none;
+            }
+        }
+        
+        /* Mobile - adjust layout */
+        @media (max-width: 767px) {
+            body {
+                padding: 0;
+            }
+            
+            #gameContainer {
+                border: none;
+                width: 100vw;
+                height: 100vh;
+            }
+            
+            canvas {
+                width: 100vw !important;
+                height: 100vh !important;
+            }
+            
+            .screen-title {
+                font-size: 32px !important;
+            }
+            
+            .screen-subtitle {
+                font-size: 18px !important;
+            }
+            
+            .btn {
+                padding: 12px 30px !important;
+                font-size: 16px !important;
+            }
+            
+            .instructions {
+                font-size: 12px;
+                max-width: 90%;
+                max-height: 60vh;
+                overflow-y: auto;
+            }
+        }
+        
+        /* Landscape mobile optimization */
+        @media (max-width: 767px) and (orientation: landscape) {
+            .screen-title {
+                font-size: 24px !important;
+                margin-bottom: 10px !important;
+            }
+            
+            .screen-subtitle {
+                font-size: 14px !important;
+                margin-bottom: 10px !important;
+            }
+            
+            .btn {
+                padding: 8px 20px !important;
+                font-size: 14px !important;
+                margin: 5px !important;
+            }
         }
         
         #menuScreen, #gameOverScreen, #victoryScreen {
@@ -82,6 +215,10 @@
             transform: scale(1.05);
         }
         
+        .btn:active {
+            transform: scale(0.95);
+        }
+        
         .instructions {
             max-width: 600px;
             text-align: left;
@@ -123,6 +260,14 @@
     <div id="gameContainer">
         <canvas id="gameCanvas" width="800" height="600"></canvas>
         
+        <!-- Mobile Controls -->
+        <div id="mobileControls">
+            <div id="joystick" class="control-button">
+                <div id="joystickKnob"></div>
+            </div>
+            <div id="cloakButton" class="control-button">CLOAK</div>
+        </div>
+        
         <!-- Menu Screen -->
         <div id="menuScreen">
             <div class="screen-title">SHADOW PROTOCOL</div>
@@ -134,15 +279,21 @@
                 <p><strong>Objective:</strong> Infiltrate the facility, retrieve the Data Core, and reach the extraction point.</p>
                 
                 <h3>CONTROLS</h3>
+                <p><strong>Desktop:</strong></p>
                 <ul>
                     <li><strong>WASD or Arrow Keys:</strong> Move in 8 directions</li>
                     <li><strong>SHIFT:</strong> Activate Cloaking Device</li>
+                </ul>
+                <p><strong>Mobile:</strong></p>
+                <ul>
+                    <li><strong>Joystick (left):</strong> Move character</li>
+                    <li><strong>CLOAK button (right):</strong> Activate invisibility</li>
                 </ul>
                 
                 <h3>GAMEPLAY</h3>
                 <ul>
                     <li><strong>Stealth:</strong> Avoid enemy vision cones (red triangles)</li>
-                    <li><strong>Cloaking:</strong> Hold SHIFT to become invisible (uses energy)</li>
+                    <li><strong>Cloaking:</strong> Use cloak to become invisible (uses energy)</li>
                     <li><strong>Laser Grids:</strong> Time your movement through flickering barriers</li>
                     <li><strong>Detection:</strong> If spotted, guards will pursue and damage you</li>
                     <li><strong>Health:</strong> Don't let it reach zero or mission fails</li>
@@ -524,7 +675,16 @@
         class InputHandler {
             constructor() {
                 this.keys = {};
+                this.mobileInput = {
+                    dx: 0,
+                    dy: 0,
+                    cloaking: false
+                };
+                this.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
                 this.setupEventListeners();
+                if (this.isMobile) {
+                    this.setupMobileControls();
+                }
             }
 
             setupEventListeners() {
@@ -542,11 +702,85 @@
                 });
             }
 
+            setupMobileControls() {
+                const joystick = document.getElementById('joystick');
+                const joystickKnob = document.getElementById('joystickKnob');
+                const cloakButton = document.getElementById('cloakButton');
+                
+                let joystickActive = false;
+                let joystickCenter = { x: 0, y: 0 };
+                const maxDistance = 35;
+
+                // Joystick touch handling
+                const handleJoystickStart = (e) => {
+                    e.preventDefault();
+                    joystickActive = true;
+                    const rect = joystick.getBoundingClientRect();
+                    joystickCenter = {
+                        x: rect.left + rect.width / 2,
+                        y: rect.top + rect.height / 2
+                    };
+                };
+
+                const handleJoystickMove = (e) => {
+                    if (!joystickActive) return;
+                    e.preventDefault();
+                    
+                    const touch = e.touches[0];
+                    let dx = touch.clientX - joystickCenter.x;
+                    let dy = touch.clientY - joystickCenter.y;
+                    
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance > maxDistance) {
+                        dx = (dx / distance) * maxDistance;
+                        dy = (dy / distance) * maxDistance;
+                    }
+                    
+                    joystickKnob.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+                    
+                    this.mobileInput.dx = dx / maxDistance;
+                    this.mobileInput.dy = dy / maxDistance;
+                };
+
+                const handleJoystickEnd = (e) => {
+                    e.preventDefault();
+                    joystickActive = false;
+                    joystickKnob.style.transform = 'translate(-50%, -50%)';
+                    this.mobileInput.dx = 0;
+                    this.mobileInput.dy = 0;
+                };
+
+                joystick.addEventListener('touchstart', handleJoystickStart);
+                joystick.addEventListener('touchmove', handleJoystickMove);
+                joystick.addEventListener('touchend', handleJoystickEnd);
+                joystick.addEventListener('touchcancel', handleJoystickEnd);
+
+                // Cloak button handling
+                cloakButton.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    this.mobileInput.cloaking = true;
+                });
+
+                cloakButton.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    this.mobileInput.cloaking = false;
+                });
+
+                cloakButton.addEventListener('touchcancel', (e) => {
+                    e.preventDefault();
+                    this.mobileInput.cloaking = false;
+                });
+            }
+
             isPressed(key) {
                 return this.keys[key] || false;
             }
 
             isMoving() {
+                if (this.isMobile) {
+                    return this.mobileInput.dx !== 0 || this.mobileInput.dy !== 0;
+                }
                 return this.isPressed('w') || this.isPressed('a') || 
                        this.isPressed('s') || this.isPressed('d') ||
                        this.isPressed('arrowup') || this.isPressed('arrowdown') ||
@@ -554,10 +788,27 @@
             }
 
             isCloaking() {
+                if (this.isMobile) {
+                    return this.mobileInput.cloaking;
+                }
                 return this.isPressed('shift');
             }
 
             getMovementVector() {
+                if (this.isMobile) {
+                    const dx = this.mobileInput.dx;
+                    const dy = this.mobileInput.dy;
+                    const length = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (length > 0) {
+                        return { 
+                            dx: dx / length, 
+                            dy: dy / length 
+                        };
+                    }
+                    return { dx: 0, dy: 0 };
+                }
+                
                 let dx = 0;
                 let dy = 0;
 
@@ -990,6 +1241,57 @@
                 this.gameOverScreen = document.getElementById('gameOverScreen');
                 this.victoryScreen = document.getElementById('victoryScreen');
                 this.instructionsPanel = document.getElementById('instructionsPanel');
+                this.mobileControls = document.getElementById('mobileControls');
+                
+                // Handle canvas scaling for different screen sizes
+                this.resizeCanvas();
+                window.addEventListener('resize', () => this.resizeCanvas());
+                window.addEventListener('orientationchange', () => {
+                    setTimeout(() => this.resizeCanvas(), 100);
+                });
+            }
+
+            resizeCanvas() {
+                const container = document.getElementById('gameContainer');
+                const canvas = this.canvas;
+                
+                // Check if mobile
+                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                
+                if (isMobile) {
+                    // Full screen on mobile
+                    const width = window.innerWidth;
+                    const height = window.innerHeight;
+                    
+                    container.style.width = width + 'px';
+                    container.style.height = height + 'px';
+                    
+                    // Show mobile controls
+                    if (this.mobileControls) {
+                        this.mobileControls.style.display = 'block';
+                    }
+                } else {
+                    // Scale to fit screen on desktop while maintaining aspect ratio
+                    const maxWidth = Math.min(window.innerWidth - 40, 800);
+                    const maxHeight = Math.min(window.innerHeight - 40, 600);
+                    const aspectRatio = 800 / 600;
+                    
+                    let width = maxWidth;
+                    let height = width / aspectRatio;
+                    
+                    if (height > maxHeight) {
+                        height = maxHeight;
+                        width = height * aspectRatio;
+                    }
+                    
+                    container.style.width = width + 'px';
+                    container.style.height = height + 'px';
+                    
+                    // Hide mobile controls
+                    if (this.mobileControls) {
+                        this.mobileControls.style.display = 'none';
+                    }
+                }
             }
 
             initializeLevel() {
